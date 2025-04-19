@@ -91,10 +91,18 @@
 </head>
 <body>
     <div class="editor-container">
-        <div class="container-fluid">
+        <div class="container-fluid"><!--container-fluid: 所有斷點都是100%-->
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-5"><!--在md以上每一欄佔2.4格-->
                     <div class="video-panel d-flex flex-column justify-content-center align-items-center text-center p-3">
+                        <!--
+                            d-flex: display:flex
+                            flex-column:容器內物件做垂直排列
+                            justify-content:容器底下物件的主軸(x軸)排版方式
+                            align-items:容器底下物件的交錯軸(y軸)排版方式
+                            text-center:讓文字在水平方向置中
+                            p:padding m:margin mb:margin-bottom
+                        -->
                         <h5 class="mb-3 option-title">上傳短影音</h5>
                         <input type="file" id="video-upload" accept="video/*" class="form-control mb-3" style="max-width: 300px;">
                         <video id="video-preview" class="mb-3" width="300" controls style="display: none; border-radius: 6px;"></video>
@@ -120,7 +128,7 @@
                 </div>
             </div>
         </div>
-        
+        <!--btn-primary:原始按鈕樣式(未操作)-->
         <a href="{{ url_for('page2') }}" class="btn btn-primary next-btn">
             <span>下一步</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">

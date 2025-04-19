@@ -5,8 +5,8 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # 設定影片儲存資料夾
-UPLOAD_FOLDER = 'uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+UPLOAD_FOLDER = 'uploads' #目錄
+os.makedirs(UPLOAD_FOLDER, exist_ok=True) # exist_ok = true : 如果文件存在也不報錯
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
