@@ -1,9 +1,8 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify
 import os
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key' #session需要用到
 
 # 設定影片儲存資料夾
 UPLOAD_FOLDER = 'uploads'
