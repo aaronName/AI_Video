@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>預測影片熱紅機率</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .editor-container {
+            position: relative;
+            width: 90%;
+            max-width: 900px;
+            height: 600px;
+            border: 2px solid #212529;
+            background-color: white;
+            background-image: 
+                radial-gradient(#e9ecef 1px, transparent 1px);
+            background-size: 10px 10px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .video-panel {
+            height: 500px;
+            border: 1px solid #dee2e6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+            overflow-y: auto;
+        }
+        
+        .options-column {
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .option-box {
+            flex: 1;
+            border: 1px solid #ced4da;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: #fff;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .option-box:last-child {
+            margin-bottom: 0;
+        }
+        
+        .option-title {
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .next-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+        }
+        
+        .prev-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="video-panel flex-column w-100">
+                        <h5 class="mb-3 option-title">上傳短影音</h5>
+                        <!-- 上傳短影音 -->
+                        <input type="file" id="video-upload" accept="video/*" class="form-control mb-3" style="max-width: 300px;">
+                        
+                        <!-- 影片預覽 -->
+                        <video id="video-preview" class="mb-3" width="300" controls style="display: none; border-radius: 6px;"></video>
+                        
+                        <!-- 上傳並分析按鈕 -->
+                        <button id="upload-btn" class="btn btn-success mb-2" style="max-width: 300px;">上傳並分析</button>
+                        
+                        <!-- 分析中顯示 -->
+                        <div id="loading" class="text-muted" style="display: none;">分析中，請稍候...</div>
+                    </div>
+                </div>
+                
+                <!-- 建議區域（右邊） -->
+                <div class="col-md-7">
+                    <div class="options-column" id="suggestion-container">
+                        <div class="option-box">
+                            <div class="option-title">預測影片熱紅機率</div>
+                        </div>
+                        <div class="option-box">
+                            <div class="option-title">彩片標題</div>
+                        </div>
+                        <div class="option-box">
+                            <div class="option-title">字幕</div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        <a href="{{ url_for('index') }}" class="btn btn-secondary prev-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            <span>上一步</span>
+        </a>
+        
+        <a href="{{ url_for('page3') }}" class="btn btn-primary next-btn">
+            <span>下一步</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+            </svg>
+        </a>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('upload-btn').addEventListener('click', function() {
+            const fileInput = document.getElementById('video-upload');
+            const file = fileInput.files[0];
+        
+            if (!file) {
+                alert("請先選擇影片！");
+                return;
+            }
+        
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block'; // 顯示 loading
+        
+            const formData = new FormData();
+            formData.append('video', file);
+        
+            fetch('/analyze', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none'; // 隱藏 loading
+        
+                document.querySelectorAll('.option-box')[0].innerHTML = `<div class="option-title">影片風格: </div> <div>${data.style}</div>`;
+                document.querySelectorAll('.option-box')[1].innerHTML = `<div class="option-title">特效: </div> <div>${data.effect}</div>`;
+                document.querySelectorAll('.option-box')[2].innerHTML = `<div class="option-title">背景音樂: </div> <div>${data.music}</div>`;
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                console.error('Error:', error);
+                alert('分析失敗，請稍後再試。');
+            });
+        });
+
+        document.getElementById('video-upload').addEventListener('change', function () {
+            const file = this.files[0];
+            const preview = document.getElementById('video-preview');
+        
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        </script>
+</body>
+</html>
